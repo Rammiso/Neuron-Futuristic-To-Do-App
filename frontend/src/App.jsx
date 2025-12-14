@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { useAuthStore } from "./context/authStore";
 import { useThemeStore } from "./context/themeStore";
+import { useTaskStore } from "./context/taskStore";
 import { useEffect } from "react";
 
 import { LoginPage } from "./pages/LoginPage";
@@ -22,8 +23,22 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
-  const { isDark } = useThemeStore();
+  const { isAuthenticated, loadUser } = useAuthStore();
+  const { isDark, loadSettings } = useThemeStore();
+  const { fetchTasks } = useTaskStore();
+
+  // Load user on mount
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  // Load settings and tasks when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSettings();
+      fetchTasks();
+    }
+  }, [isAuthenticated, loadSettings, fetchTasks]);
 
   useEffect(() => {
     if (isDark) {

@@ -1,91 +1,95 @@
 import { create } from "zustand";
-
-const mockTasks = [
-  {
-    id: "1",
-    title: "Complete React Project",
-    description: "Build the NEURON Tasks frontend application",
-    dueDate: new Date(2024, 11, 20),
-    priority: "high",
-    completed: false,
-    tags: ["work", "react"],
-  },
-  {
-    id: "2",
-    title: "Study for Algorithms Exam",
-    description: "Review dynamic programming and graph algorithms",
-    dueDate: new Date(2024, 11, 18),
-    priority: "high",
-    completed: false,
-    tags: ["study"],
-  },
-  {
-    id: "3",
-    title: "Submit Database Assignment",
-    description: "Complete SQL queries and normalization tasks",
-    dueDate: new Date(2024, 11, 19),
-    priority: "medium",
-    completed: false,
-    tags: ["assignment"],
-  },
-  {
-    id: "4",
-    title: "Review Code Review Comments",
-    description: "Address feedback from team lead",
-    dueDate: new Date(2024, 11, 17),
-    priority: "medium",
-    completed: true,
-    tags: ["work"],
-  },
-  {
-    id: "5",
-    title: "Prepare Portfolio Projects",
-    description: "Update GitHub with latest projects",
-    dueDate: new Date(2024, 11, 22),
-    priority: "low",
-    completed: false,
-    tags: ["career"],
-  },
-];
+import api from "../utils/api";
 
 export const useTaskStore = create((set, get) => ({
-  tasks: mockTasks,
+  tasks: [],
   selectedDate: new Date(),
+  isLoading: false,
+  error: null,
 
-  addTask: (task) => {
-    const newTask = {
-      ...task,
-      id: Date.now().toString(),
-      completed: false,
-    };
-    set((state) => ({
-      tasks: [...state.tasks, newTask],
-    }));
-    return newTask;
+  // Fetch all tasks
+  fetchTasks: async (filters = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const params = new URLSearchParams(filters);
+      const { data } = await api.get(`/tasks?${params}`);
+      set({
+        tasks: data.tasks.map(task => ({
+          ...task,
+          dueDate: new Date(task.dueDate)
+        })),
+        isLoading: false
+      });
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to fetch tasks';
+      set({ error: message, isLoading: false });
+    }
   },
 
-  updateTask: (id, updates) => {
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, ...updates } : task
-      ),
-    }));
+  // Add task
+  addTask: async (taskData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.post('/tasks', taskData);
+      const newTask = {
+        ...data.task,
+        dueDate: new Date(data.task.dueDate)
+      };
+      set((state) => ({
+        tasks: [...state.tasks, newTask],
+        isLoading: false
+      }));
+      return newTask;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to create task';
+      set({ error: message, isLoading: false });
+      throw new Error(message);
+    }
   },
 
-  deleteTask: (id) => {
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
-    }));
+  // Update task
+  updateTask: async (id, updates) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.put(`/tasks/${id}`, updates);
+      set((state) => ({
+        tasks: state.tasks.map((task) =>
+          task.id === id ? { ...data.task, dueDate: new Date(data.task.dueDate) } : task
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to update task';
+      set({ error: message, isLoading: false });
+      throw new Error(message);
+    }
   },
 
-  toggleTaskComplete: (id) => {
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      ),
-    }));
+  // Delete task
+  deleteTask: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/tasks/${id}`);
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to delete task';
+      set({ error: message, isLoading: false });
+      throw new Error(message);
+    }
   },
 
+  // Toggle task complete
+  toggleTaskComplete: async (id) => {
+    const task = get().tasks.find(t => t.id === id);
+    if (task) {
+      await get().updateTask(id, { completed: !task.completed });
+    }
+  },
+
+  // Get tasks by date
   getTasksByDate: (date) => {
     const { tasks } = get();
     return tasks.filter((task) => {

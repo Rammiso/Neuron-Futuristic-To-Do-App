@@ -44,13 +44,16 @@ export const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    login(formData.email, formData.password);
-    setTimeout(() => {
+    
+    try {
+      await login(formData.email, formData.password);
       navigate("/dashboard");
-    }, 600);
+    } catch (error) {
+      setErrors({ email: error.message || 'Login failed' });
+    }
   };
 
   return (
@@ -152,8 +155,12 @@ export const LoginPage = () => {
             transition={{ delay: 0.7 }}
             className="mt-6 p-4 bg-neon-cyan/10 border border-neon-cyan/30 rounded-lg"
           >
-            <p className="text-xs font-semibold text-neon-cyan font-mono">
-              DEMO: Use any credentials to access system
+            <p className="text-xs font-semibold text-neon-cyan font-mono mb-2">
+              DEMO CREDENTIALS:
+            </p>
+            <p className="text-xs text-gray-300 font-mono">
+              Email: demo@neurontasks.com<br />
+              Password: demo123
             </p>
           </motion.div>
         </div>

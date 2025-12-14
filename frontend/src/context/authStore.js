@@ -1,68 +1,97 @@
 import { create } from "zustand";
+import api from "../utils/api";
 
 export const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  error: null,
 
-  login: (email, password) => {
-    set({ isLoading: true });
-    setTimeout(() => {
+  // Register user
+  register: async (name, email, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.post('/auth/register', { name, email, password });
+      localStorage.setItem('token', data.token);
       set({
-        user: {
-          id: "1",
-          email,
-          name: email.split("@")[0],
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-          phone: "",
-          location: "",
-          role: "Student",
-          bio: "",
-          joinDate: new Date().toISOString().split("T")[0],
-          tasksCompleted: 0,
-          streak: 0,
-          level: 1,
-        },
+        user: data.user,
         isAuthenticated: true,
-        isLoading: false,
+        isLoading: false
       });
-    }, 800);
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed';
+      set({ error: message, isLoading: false });
+      throw new Error(message);
+    }
   },
 
-  register: (name, email, password) => {
-    set({ isLoading: true });
-    setTimeout(() => {
+  // Login user
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', data.token);
       set({
-        user: {
-          id: "1",
-          email,
-          name,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-          phone: "",
-          location: "",
-          role: "Student",
-          bio: "",
-          joinDate: new Date().toISOString().split("T")[0],
-          tasksCompleted: 0,
-          streak: 0,
-          level: 1,
-        },
+        user: data.user,
         isAuthenticated: true,
-        isLoading: false,
+        isLoading: false
       });
-    }, 800);
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Login failed';
+      set({ error: message, isLoading: false });
+      throw new Error(message);
+    }
   },
 
-  updateUser: (userData) => {
-    set((state) => ({
-      user: {
-        ...state.user,
-        ...userData,
-      },
-    }));
+  // Get current user
+  loadUser: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    set({ isLoading: true });
+    try {
+      const { data } = await api.get('/auth/me');
+      set({
+        user: data.user,
+        isAuthenticated: true,
+        isLoading: false
+      });
+    } catch (error) {
+      localStorage.removeItem('token');
+      set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false
+      });
+    }
   },
 
+  // Update user profile
+  updateUser: async (userData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.put('/auth/profile', userData);
+      set({
+        user: data.user,
+        isLoading: false
+      });
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Update failed';
+      set({ error: message, isLoading: false });
+      throw new Error(message);
+    }
+  },
+
+  // Logout
   logout: () => {
-    set({ user: null, isAuthenticated: false });
+    localStorage.removeItem('token');
+    set({
+      user: null,
+      isAuthenticated: false,
+      error: null
+    });
   },
 }));

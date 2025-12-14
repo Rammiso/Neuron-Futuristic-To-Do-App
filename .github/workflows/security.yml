@@ -1,0 +1,44 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security audit weekly
+    - cron: '0 0 * * 0'
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        directory: [backend, frontend]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: ${{ matrix.directory }}/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd ${{ matrix.directory }}
+        npm ci
+    
+    - name: Run security audit
+      run: |
+        cd ${{ matrix.directory }}
+        npm audit --audit-level=moderate
+    
+    - name: Check for vulnerabilities
+      run: |
+        cd ${{ matrix.directory }}
+        npm audit --audit-level=high --dry-run

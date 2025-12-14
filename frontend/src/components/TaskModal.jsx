@@ -44,19 +44,23 @@ export const TaskModal = ({ isOpen, onClose, task = null }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    if (task) {
-      updateTask(task.id, formData);
-    } else {
-      addTask({
-        ...formData,
-        dueDate: new Date(formData.dueDate),
-      });
+    try {
+      if (task) {
+        await updateTask(task.id, formData);
+      } else {
+        await addTask({
+          ...formData,
+          dueDate: new Date(formData.dueDate),
+        });
+      }
+      onClose();
+    } catch (error) {
+      setErrors({ title: error.message || 'Failed to save task' });
     }
-    onClose();
   };
 
   return (
@@ -137,7 +141,7 @@ export const TaskModal = ({ isOpen, onClose, task = null }) => {
         >
           <AlertCircle className="w-5 h-5 text-blue-600 dark:text-neon-cyan flex-shrink-0 mt-0.5" />
           <p className="text-sm text-gray-700 dark:text-gray-400 font-mono">
-            Tasks saved to local session
+            Tasks are synced with the database
           </p>
         </motion.div>
 

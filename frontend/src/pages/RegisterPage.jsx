@@ -54,13 +54,16 @@ export const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    register(formData.name, formData.email, formData.password);
-    setTimeout(() => {
+    
+    try {
+      await register(formData.name, formData.email, formData.password);
       navigate("/dashboard");
-    }, 600);
+    } catch (error) {
+      setErrors({ email: error.message || 'Registration failed' });
+    }
   };
 
   return (
