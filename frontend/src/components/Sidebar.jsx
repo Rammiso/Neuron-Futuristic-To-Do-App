@@ -4,21 +4,23 @@ import {
   LayoutDashboard,
   Calendar,
   CheckSquare,
-  Zap,
+  Brain,
   Settings,
   LogOut,
   Menu,
   X,
+  Activity,
+  Zap
 } from "lucide-react";
 import { useAuthStore } from "../context/authStore";
 import { useState } from "react";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: Calendar, label: "Calendar", path: "/calendar" },
-  { icon: CheckSquare, label: "Tasks", path: "/tasks" },
-  { icon: Zap, label: "AI Assistant", path: "/ai" },
-  { icon: Settings, label: "Settings", path: "/settings" },
+  { icon: LayoutDashboard, label: "Neural Hub", path: "/dashboard", description: "Command Center" },
+  { icon: Calendar, label: "Timeline", path: "/calendar", description: "Temporal Grid" },
+  { icon: CheckSquare, label: "Task Matrix", path: "/tasks", description: "Objective Queue" },
+  { icon: Brain, label: "AI Core", path: "/ai", description: "Neural Assistant" },
+  { icon: Settings, label: "System Config", path: "/settings", description: "Parameters" },
 ];
 
 export const Sidebar = () => {
@@ -34,26 +36,28 @@ export const Sidebar = () => {
 
   const sidebarContent = (isMobile = false) => (
     <>
-      <div className="p-6 border-b border-gray-200 dark:border-cyber-border relative">
+      {/* Header */}
+      <div className="p-6 border-b border-emerald-500/20 relative">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3"
+          className="flex items-center space-x-3"
         >
-          <div className="w-10 h-10 rounded-lg bg-neon-dark dark:bg-neon-green flex items-center justify-center shadow-neon-green">
-            <Zap className="w-6 h-6 text-white dark:text-cyber-darker" />
+          <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-lg flex items-center justify-center">
+            <Brain className="w-7 h-7 text-black" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-neon-dark dark:text-neon-green font-mono">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent font-mono">
               NEURON
             </h1>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 font-mono">
-              v1.0.0
-            </p>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              <p className="text-xs text-gray-400 font-mono">NEURAL INTERFACE</p>
+            </div>
           </div>
         </motion.div>
         
-        {/* Close button inside mobile sidebar */}
+        {/* Close button for mobile */}
         {isMobile && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
@@ -61,13 +65,14 @@ export const Sidebar = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(false)}
-            className="absolute top-6 right-6 p-2 hover:bg-gray-100 dark:hover:bg-cyber-card rounded-lg transition-colors"
+            className="absolute top-6 right-6 p-2 hover:bg-emerald-500/10 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-400 hover:text-emerald-400" />
           </motion.button>
         )}
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navItems.map((item, index) => {
           const Icon = item.icon;
@@ -78,25 +83,69 @@ export const Sidebar = () => {
               key={item.path}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ x: 4 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ 
+                x: 6,
+                boxShadow: isActive ? undefined : "0 0 20px rgba(16, 185, 129, 0.1)"
+              }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 navigate(item.path);
                 setIsOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-semibold relative ${
+              className={`w-full group relative overflow-hidden rounded-xl transition-all duration-300 ${
                 isActive
-                  ? "glass-neon text-neon-dark dark:text-neon-green"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-cyber-card hover:text-gray-900 dark:hover:text-gray-200"
+                  ? "bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 text-emerald-400"
+                  : "text-gray-400 hover:text-white hover:bg-gray-800/50 border border-transparent"
               }`}
             >
-              <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
+              <div className="flex items-center space-x-4 p-4">
+                <div className={`relative ${isActive ? 'text-emerald-400' : 'text-gray-500 group-hover:text-emerald-400'} transition-colors`}>
+                  <Icon className="w-5 h-5" />
+                  {isActive && (
+                    <motion.div
+                      className="absolute inset-0 bg-emerald-400/20 rounded-full blur-sm"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.5, 0.8, 0.5],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                      }}
+                    />
+                  )}
+                </div>
+                
+                <div className="flex-1 text-left">
+                  <div className={`font-semibold font-mono ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'} transition-colors`}>
+                    {item.label}
+                  </div>
+                  <div className={`text-xs font-mono ${isActive ? 'text-emerald-400/70' : 'text-gray-500 group-hover:text-gray-400'} transition-colors`}>
+                    {item.description}
+                  </div>
+                </div>
+
+                {isActive && (
+                  <motion.div
+                    layoutId={isMobile ? "activeIndicatorMobile" : "activeIndicator"}
+                    className="w-2 h-8 bg-gradient-to-b from-emerald-400 to-cyan-400 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                  />
+                )}
+              </div>
+
+              {/* Holographic scan line */}
               {isActive && (
                 <motion.div
-                  layoutId={isMobile ? "activeIndicatorMobile" : "activeIndicator"}
-                  className="ml-auto w-2 h-2 rounded-full bg-neon-dark dark:bg-neon-green shadow-neon-green"
+                  className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent"
+                  animate={{
+                    opacity: [0.3, 0.8, 0.3],
+                    scaleX: [0.8, 1, 0.8],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                  }}
                 />
               )}
             </motion.button>
@@ -104,15 +153,49 @@ export const Sidebar = () => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-200 dark:border-cyber-border">
+      {/* System Status */}
+      <div className="p-4 border-t border-emerald-500/20">
+        <div className="mb-4 p-3 bg-gray-800/30 rounded-lg border border-gray-700/50">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-mono text-gray-400">SYSTEM STATUS</span>
+            <div className="flex items-center space-x-1">
+              <Activity className="w-3 h-3 text-emerald-400" />
+              <span className="text-xs font-mono text-emerald-400">OPTIMAL</span>
+            </div>
+          </div>
+          <div className="flex space-x-1">
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="h-1 flex-1 bg-emerald-400/20 rounded-full overflow-hidden"
+                animate={{
+                  backgroundColor: [
+                    "rgba(16, 185, 129, 0.2)",
+                    "rgba(16, 185, 129, 0.6)",
+                    "rgba(16, 185, 129, 0.2)"
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
         <motion.button
-          whileHover={{ x: 4 }}
+          whileHover={{ 
+            x: 4,
+            boxShadow: "0 0 20px rgba(239, 68, 68, 0.2)"
+          }}
           whileTap={{ scale: 0.98 }}
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors font-semibold"
+          className="w-full flex items-center space-x-3 p-4 rounded-xl text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/30 transition-all duration-300 font-mono"
         >
           <LogOut className="w-5 h-5" />
-          <span>Logout</span>
+          <span>DISCONNECT</span>
         </motion.button>
       </div>
     </>
@@ -124,21 +207,25 @@ export const Sidebar = () => {
       <motion.div
         initial={{ opacity: 0, x: -300 }}
         animate={{ opacity: 1, x: 0 }}
-        className="hidden md:flex flex-col w-64 glass-neon border-r border-gray-200 dark:border-cyber-border h-screen sticky top-0"
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="hidden md:flex flex-col w-72 bg-gray-900/50 backdrop-blur-xl border-r border-emerald-500/20 h-screen sticky top-0"
       >
         {sidebarContent(false)}
       </motion.div>
 
-      {/* Mobile Menu Button - only show when menu is closed */}
+      {/* Mobile Menu Button */}
       {!isOpen && (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ 
+            scale: 1.05,
+            boxShadow: "0 0 20px rgba(16, 185, 129, 0.3)"
+          }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="md:hidden fixed top-5 left-4 z-50 p-2.5 glass-neon rounded-lg text-neon-dark dark:text-neon-green shadow-lg"
+          className="md:hidden fixed top-5 left-4 z-50 p-3 bg-gray-900/80 backdrop-blur-sm border border-emerald-500/30 rounded-xl text-emerald-400 shadow-lg"
         >
           <Menu className="w-5 h-5" />
         </motion.button>
@@ -158,7 +245,7 @@ export const Sidebar = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
               onClick={() => setIsOpen(false)}
             />
             
@@ -168,7 +255,7 @@ export const Sidebar = () => {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-64 glass-neon border-r border-gray-200 dark:border-cyber-border flex flex-col bg-white dark:bg-cyber-card"
+              className="relative w-72 bg-gray-900/95 backdrop-blur-xl border-r border-emerald-500/20 flex flex-col"
             >
               {sidebarContent(true)}
             </motion.div>

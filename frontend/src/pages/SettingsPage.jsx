@@ -14,9 +14,15 @@ import {
   Download,
   Trash2,
   Database,
-  Palette
+  Palette,
+  Settings,
+  Monitor,
+  Cpu,
+  Activity
 } from "lucide-react";
 import { Button } from "../components/Button";
+import { HolographicCard } from "../components/HolographicCard";
+import { ParticleBackground } from "../components/ParticleBackground";
 import { useState } from "react";
 
 export const SettingsPage = () => {
@@ -133,13 +139,21 @@ export const SettingsPage = () => {
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            className="text-4xl lg:text-5xl font-bold mb-2"
           >
-            Settings
+            <span className="text-white">Neural</span>{" "}
+            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              Settings
+            </span>
           </motion.h1>
-          <p className="text-gray-600 dark:text-gray-400 font-mono text-sm">
-            SYSTEM CONFIGURATION
-          </p>
+          <div className="flex items-center space-x-4 text-gray-400 font-mono text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              <span>SYSTEM CONFIGURATION</span>
+            </div>
+            <span>•</span>
+            <span>USER ID: {user?.id?.slice(0, 8).toUpperCase()}</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -148,11 +162,16 @@ export const SettingsPage = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass rounded-lg p-6"
           >
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6 font-mono">
-              ACCOUNT
-            </h2>
+            <HolographicCard className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2.5 bg-emerald-400/10 border border-emerald-400/30 rounded-lg">
+                  <User className="w-5 h-5 text-emerald-400" />
+                </div>
+                <h2 className="text-lg font-bold text-white font-mono">
+                  NEURAL PROFILE
+                </h2>
+              </div>
             <div className="space-y-5">
               <div>
                 <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider font-mono">
@@ -184,6 +203,7 @@ export const SettingsPage = () => {
                 </div>
               </div>
             </div>
+            </HolographicCard>
           </motion.div>
 
           {/* Settings Sections */}

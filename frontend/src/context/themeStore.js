@@ -21,7 +21,9 @@ export const useThemeStore = create((set, get) => ({
         document.documentElement.classList.remove("dark");
       }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to load settings:', error);
+      }
     }
   },
 
@@ -44,7 +46,9 @@ export const useThemeStore = create((set, get) => ({
       }
     } catch (error) {
       set({ isLoading: false });
-      console.error('Failed to update theme:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to update theme:', error);
+      }
     }
   },
 
@@ -61,7 +65,9 @@ export const useThemeStore = create((set, get) => ({
       set({ aiEnabled: newAI, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
-      console.error('Failed to update AI setting:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to update AI setting:', error);
+      }
     }
   },
 

@@ -85,7 +85,9 @@ export const ProfileModal = ({ isOpen, onClose }) => {
       setIsEditing(false);
       alert('Profile updated successfully!');
     } catch (error) {
-      console.error('Profile update error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Profile update error:', error);
+      }
       const errorMessage = error.response?.data?.errors 
         ? error.response.data.errors.join(', ')
         : error.message || 'Failed to update profile';

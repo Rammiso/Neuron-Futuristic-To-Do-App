@@ -1,22 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Modal } from "./Modal";
 import { Input } from "./Input";
 import { Button } from "./Button";
+import { DatePicker } from "./DatePicker";
 import { useTaskStore } from "../context/taskStore";
-import { Calendar, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export const TaskModal = ({ isOpen, onClose, task = null }) => {
   const { addTask, updateTask } = useTaskStore();
-  const [formData, setFormData] = useState(
-    task || {
+  
+  // Initialize form data
+  const getInitialFormData = () => {
+    if (task) {
+      return {
+        ...task,
+        dueDate: task.dueDate instanceof Date 
+          ? task.dueDate.toISOString().split("T")[0]
+          : task.dueDate
+      };
+    }
+    
+    return {
       title: "",
       description: "",
       dueDate: new Date().toISOString().split("T")[0],
       priority: "medium",
-    }
-  );
+    };
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData());
   const [errors, setErrors] = useState({});
+
+  // Update form data when task changes
+  useEffect(() => {
+    setFormData(getInitialFormData());
+    setErrors({}); // Clear errors when modal opens with new data
+  }, [task, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,17 +119,10 @@ export const TaskModal = ({ isOpen, onClose, task = null }) => {
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 font-mono">
               Due Date
             </label>
-            <div className="relative group">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-neon-dark dark:group-focus-within:text-neon-green transition-colors" />
-              <input
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 glass rounded-lg input-focus text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-cyber-border font-mono"
-                required
-              />
-            </div>
+            <DatePicker
+              value={formData.dueDate}
+              onChange={(date) => handleChange({ target: { name: 'dueDate', value: date } })}
+            />
             {errors.dueDate && (
               <p className="text-sm font-medium text-red-600 dark:text-red-400 mt-1.5">
                 {errors.dueDate}

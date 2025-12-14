@@ -22,11 +22,13 @@ app.use(helmet());
 app.use(mongoSanitize());
 
 // CORS configuration - Allow multiple origins for development
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  process.env.CLIENT_URL
-].filter(Boolean);
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? [process.env.CORS_ORIGIN].filter(Boolean)
+  : [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      process.env.CLIENT_URL
+    ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -88,7 +90,9 @@ app.use(errorHandler);
 // Start server
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  }
 });
 
 // Handle unhandled promise rejections
@@ -99,8 +103,12 @@ process.on('unhandledRejection', (err) => {
 
 // Handle SIGTERM
 process.on('SIGTERM', () => {
-  console.log('👋 SIGTERM received, shutting down gracefully');
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('👋 SIGTERM received, shutting down gracefully');
+  }
   server.close(() => {
-    console.log('✅ Process terminated');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ Process terminated');
+    }
   });
 });

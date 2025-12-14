@@ -1,93 +1,145 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Bell, User, Moon, Sun } from "lucide-react";
+import { Bell, User, Wifi, Activity, Zap } from "lucide-react";
 import { useAuthStore } from "../context/authStore";
-import { useThemeStore } from "../context/themeStore";
 import { getMonthYear } from "../utils/dateUtils";
 import { ProfileModal } from "./ProfileModal";
 
 export const Topbar = () => {
   const { user } = useAuthStore();
-  const { isDark, toggleTheme } = useThemeStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-neon border-b border-cyber-border dark:border-cyber-border sticky top-0 z-30 bg-white/80 dark:bg-cyber-card/80 backdrop-blur-xl"
+      className="bg-gray-900/50 backdrop-blur-xl border-b border-emerald-500/20 sticky top-0 z-30"
     >
       <div className="px-6 py-4 flex items-center justify-between">
-        {/* Left side - Date with mobile spacing */}
-        <div className="font-mono ml-0 md:ml-0 pl-14 md:pl-0">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-neon-green">
-            {getMonthYear(new Date())}
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {new Date().toLocaleDateString("en-US", { weekday: "long" })}
-          </p>
+        {/* Left side - System Info */}
+        <div className="flex items-center space-x-6 pl-14 md:pl-0">
+          <div className="font-mono">
+            <h2 className="text-lg font-bold text-white flex items-center">
+              <Activity className="w-4 h-4 text-emerald-400 mr-2" />
+              {getMonthYear(new Date())}
+            </h2>
+            <p className="text-sm text-gray-400 flex items-center">
+              <span>{new Date().toLocaleDateString("en-US", { weekday: "long" })}</span>
+              <span className="mx-2">•</span>
+              <span>{currentTime.toLocaleTimeString()}</span>
+            </p>
+          </div>
+
+          {/* System Status Indicators */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <div className="flex items-center space-x-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+              <Wifi className="w-3 h-3 text-emerald-400" />
+              <span className="text-xs font-mono text-emerald-400">ONLINE</span>
+            </div>
+            <div className="flex items-center space-x-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full">
+              <Zap className="w-3 h-3 text-cyan-400" />
+              <span className="text-xs font-mono text-cyan-400">NEURAL</span>
+            </div>
+          </div>
         </div>
 
         {/* Right side - Actions */}
-        <div className="flex items-center gap-2 md:gap-3">
-          {/* Theme Toggle */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleTheme}
-            className="p-2 md:p-2.5 hover:bg-gray-200 dark:hover:bg-cyber-card rounded-lg transition-colors"
-            title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          >
-            {isDark ? (
-              <Sun className="w-4 h-4 md:w-5 md:h-5 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
-            )}
-          </motion.button>
-
+        <div className="flex items-center space-x-3">
           {/* Notifications */}
           <motion.button
-            whileHover={{ scale: 1.1 }}
+            whileHover={{ 
+              scale: 1.1,
+              boxShadow: "0 0 15px rgba(16, 185, 129, 0.3)"
+            }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 md:p-2.5 hover:bg-gray-200 dark:hover:bg-cyber-card rounded-lg transition-colors relative"
+            className="p-2.5 bg-gray-800/50 hover:bg-emerald-500/10 border border-gray-700 hover:border-emerald-500/30 rounded-lg transition-all duration-300 relative"
           >
-            <Bell className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-400" />
-            <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-2 h-2 bg-neon-green rounded-full shadow-neon-green" />
+            <Bell className="w-5 h-5 text-gray-400 hover:text-emerald-400 transition-colors" />
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+              }}
+              className="absolute top-2 right-2 w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_6px_rgba(16,185,129,0.8)]"
+            />
           </motion.button>
 
-          {/* User info - hidden on small mobile */}
+          {/* User Profile - Desktop */}
           {user && (
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ 
+                scale: 1.02,
+                boxShadow: "0 0 20px rgba(16, 185, 129, 0.2)"
+              }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsProfileOpen(true)}
-              className="hidden sm:flex items-center gap-3 pl-4 border-l border-gray-300 dark:border-cyber-border hover:bg-gray-100 dark:hover:bg-cyber-card/50 rounded-lg pr-2 py-1 transition-colors"
+              className="hidden sm:flex items-center space-x-3 pl-4 border-l border-emerald-500/20 hover:bg-emerald-500/5 rounded-lg pr-3 py-2 transition-all duration-300"
             >
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-semibold text-white font-mono">
                   {user.name}
                 </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-                  ACTIVE
-                </p>
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                  <p className="text-xs text-emerald-400 font-mono">CONNECTED</p>
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-neon-dark/20 dark:bg-neon-green/20 border border-neon-dark/30 dark:border-neon-green/30 flex items-center justify-center">
-                <User className="w-5 h-5 text-neon-dark dark:text-neon-green" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 border border-emerald-500/30 flex items-center justify-center">
+                <User className="w-5 h-5 text-emerald-400" />
               </div>
             </motion.button>
           )}
           
-          {/* User avatar only on mobile */}
+          {/* User Profile - Mobile */}
           {user && (
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ 
+                scale: 1.1,
+                boxShadow: "0 0 15px rgba(16, 185, 129, 0.3)"
+              }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsProfileOpen(true)}
-              className="sm:hidden w-8 h-8 rounded-full bg-neon-dark/20 dark:bg-neon-green/20 border border-neon-dark/30 dark:border-neon-green/30 flex items-center justify-center ml-2"
+              className="sm:hidden w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 border border-emerald-500/30 flex items-center justify-center"
             >
-              <User className="w-4 h-4 text-neon-dark dark:text-neon-green" />
+              <User className="w-5 h-5 text-emerald-400" />
             </motion.button>
           )}
+        </div>
+      </div>
+
+      {/* Neural Activity Bar */}
+      <div className="px-6 pb-2">
+        <div className="flex space-x-1 h-1">
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="flex-1 bg-emerald-500/20 rounded-full overflow-hidden"
+              animate={{
+                backgroundColor: [
+                  "rgba(16, 185, 129, 0.2)",
+                  "rgba(16, 185, 129, 0.6)",
+                  "rgba(16, 185, 129, 0.2)"
+                ]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            />
+          ))}
         </div>
       </div>
 

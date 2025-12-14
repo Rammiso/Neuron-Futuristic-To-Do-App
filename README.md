@@ -88,7 +88,6 @@ npm run dev   # Starts on port 5173
 ### 4. Access Application
 - **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:5000
-- **Demo Login:** demo@neurontasks.com / demo123
 
 **New to the project?** Follow the setup instructions above!
 

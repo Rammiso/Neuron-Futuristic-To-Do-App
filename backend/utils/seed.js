@@ -7,6 +7,12 @@ import Settings from '../models/Settings.js';
 dotenv.config();
 
 const seedData = async () => {
+  // Only run in development environment
+  if (process.env.NODE_ENV === 'production') {
+    console.log('⚠️  Seed script disabled in production environment');
+    process.exit(0);
+  }
+
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ Connected to MongoDB');

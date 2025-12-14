@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "seed": "node utils/seed.js",
+    "seed:prod": "node utils/seed.production.js",
     "build": "echo 'No build step required for Node.js backend'",
     "lint": "echo 'No linting configured'"
   },

@@ -183,3 +183,252 @@ html.dark ::-webkit-scrollbar-thumb:hover {
     transition-duration: 0.01ms !important;
   }
 }
+/* Additional Cyberpunk Effects */
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(0, 255, 136, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.hologram-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.hologram-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 136, 0.2),
+    transparent
+  );
+  animation: hologram-scan 3s infinite;
+}
+
+@keyframes hologram-scan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.neural-pulse {
+  animation: neural-pulse 2s ease-in-out infinite;
+}
+
+@keyframes neural-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    transform: scale(1.02);
+  }
+}
+
+.data-stream {
+  position: relative;
+  overflow: hidden;
+}
+
+.data-stream::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 255, 136, 0.8),
+    transparent
+  );
+  animation: data-flow 1.5s linear infinite;
+}
+
+@keyframes data-flow {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.matrix-text {
+  font-family: 'JetBrains Mono', monospace;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  animation: matrix-flicker 0.1s infinite alternate;
+}
+
+@keyframes matrix-flicker {
+  0% { opacity: 0.98; }
+  100% { opacity: 1; }
+}
+
+/* Particle Trail Effect */
+.particle-trail {
+  position: relative;
+}
+
+.particle-trail::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: particle-float 4s ease-in-out infinite;
+}
+
+@keyframes particle-float {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% { 
+    transform: translate(10px, -10px) scale(1.2);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translate(-5px, -20px) scale(0.8);
+    opacity: 0.6;
+  }
+  75% { 
+    transform: translate(-10px, -10px) scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+/* Enhanced Button Effects */
+.cyber-button {
+  position: relative;
+  background: linear-gradient(45deg, rgba(0, 255, 136, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.cyber-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 136, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.cyber-button:hover::before {
+  left: 100%;
+}
+
+.cyber-button:hover {
+  box-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.4),
+    inset 0 0 20px rgba(0, 255, 136, 0.1);
+  border-color: rgba(0, 255, 136, 0.6);
+}
+
+/* Loading Animation */
+.neural-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 50%;
+  border-top-color: #00ff88;
+  animation: neural-spin 1s ease-in-out infinite;
+}
+
+@keyframes neural-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Glitch Effect */
+.glitch {
+  position: relative;
+  color: #00ff88;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  animation: glitch-1 0.5s infinite;
+  color: #ff0040;
+  z-index: -1;
+}
+
+.glitch::after {
+  animation: glitch-2 0.5s infinite;
+  color: #00ffff;
+  z-index: -2;
+}
+
+@keyframes glitch-1 {
+  0%, 14%, 15%, 49%, 50%, 99%, 100% {
+    transform: translate(0);
+  }
+  15%, 49% {
+    transform: translate(-2px, 0);
+  }
+}
+
+@keyframes glitch-2 {
+  0%, 20%, 21%, 62%, 63%, 99%, 100% {
+    transform: translate(0);
+  }
+  21%, 62% {
+    transform: translate(2px, 0);
+  }
+}
+
+/* Responsive Design Enhancements */
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: blur(8px);
+  }
+  
+  .particle-trail::before {
+    display: none; /* Disable particles on mobile for performance */
+  }
+  
+  .hologram-effect::before {
+    animation-duration: 4s; /* Slower animations on mobile */
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .neon-text {
+    text-shadow: none;
+    color: #00ff00;
+  }
+  
+  .glass {
+    border-width: 2px;
+  }
+  
+  .neon-border {
+    border-width: 2px;
+  }
+}
