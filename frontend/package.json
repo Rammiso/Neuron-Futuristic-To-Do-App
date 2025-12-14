@@ -1,0 +1,52 @@
+{
+  "name": "neuron-tasks",
+  "private": false,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A high-performance, cyberpunk-inspired task management application with AI assistance and stunning animations",
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/neuron-tasks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/neuron-tasks/issues"
+  },
+  "homepage": "https://github.com/yourusername/neuron-tasks#readme",
+  "keywords": [
+    "react",
+    "vite",
+    "task-management",
+    "productivity",
+    "cyberpunk",
+    "framer-motion",
+    "tailwindcss",
+    "zustand",
+    "ai-assistant"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "framer-motion": "^10.16.4",
+    "zustand": "^4.4.1",
+    "lucide-react": "^0.294.0",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8",
+    "tailwindcss": "^3.3.6",
+    "postcss": "^8.4.31",
+    "autoprefixer": "^10.4.16"
+  }
+}
