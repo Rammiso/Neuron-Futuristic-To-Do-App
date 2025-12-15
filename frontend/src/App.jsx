@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { useAuthStore } from "./context/authStore";
 import { useThemeStore } from "./context/themeStore";
@@ -12,6 +13,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppShell, DashboardShell } from "./components/AppShell";
 import { usePerformanceOptimization } from "./utils/performanceMonitor";
 import { useRenderLoopProtection } from "./utils/renderLoopProtection";
+import { setNavigate } from "./utils/api";
 
 // Phase 1: Critical path - immediate imports (no lazy loading)
 import { LandingPage } from "./pages/LandingPage";
@@ -68,6 +70,7 @@ const AuthAwareRoute = ({ children, isAuthenticated, redirectTo, transitionsEnab
 
 const AnimatedRoutes = ({ isInitialized }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, loadUser, checkAuthSync } = useAuthStore();
   const { isDark, loadSettings } = useThemeStore();
   const { isLowEndDevice, prefersReducedMotion } = usePerformanceOptimization();
@@ -81,6 +84,11 @@ const AnimatedRoutes = ({ isInitialized }) => {
   
   // Simple transitions control
   const transitionsEnabled = enhancementsLoaded && !isLowEndDevice && !prefersReducedMotion && !isLooping;
+
+  // Set up navigate function for API utility
+  useEffect(() => {
+    setNavigate(navigate);
+  }, [navigate]);
 
   // Single auth initialization - runs once only
   useEffect(() => {
