@@ -8,37 +8,23 @@ export default defineConfig({
     open: true,
   },
   build: {
-    // Force esbuild minification (no terser)
     minify: 'esbuild',
-    target: 'esnext',
+    target: 'es2020',
     sourcemap: false,
-    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['framer-motion', 'lucide-react'],
-          'state-vendor': ['zustand', 'axios'],
-          'dashboard-chunk': [
-            './src/pages/DashboardPage.jsx',
-            './src/pages/CalendarPage.jsx',
-            './src/pages/TasksPage.jsx'
-          ],
-          'ai-chunk': ['./src/pages/AIAssistantPage.jsx'],
-          'settings-chunk': ['./src/pages/SettingsPage.jsx'],
-          'demo-chunk': ['./src/pages/DemoMode.jsx']
+          'state-vendor': ['zustand', 'axios']
         }
       }
-    },
-    esbuild: {
-      drop: ['console', 'debugger'],
-      minify: true,
-      target: 'esnext'
     }
   },
-  // Performance optimizations
+  esbuild: {
+    drop: ['console', 'debugger']
+  },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: ['framer-motion'] // Let it be lazy loaded
+    include: ['react', 'react-dom', 'react-router-dom']
   }
 });
