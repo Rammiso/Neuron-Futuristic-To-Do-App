@@ -60,12 +60,37 @@ export const LoginPage = () => {
     e.preventDefault();
     if (!validateForm()) return;
     
+    // Clear any previous errors immediately
+    setErrors({});
+    
+    const startTime = performance.now();
+    
     try {
       await login(formData.email, formData.password);
-      navigate("/dashboard");
+      
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      // Show success feedback for very fast logins
+      if (duration < 500) {
+        // Quick success animation before navigation
+        setTimeout(() => navigate("/dashboard"), 100);
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      // Provide better error feedback based on timing
+      let errorMessage = error.message;
+      
+      if (duration > 8000) {
+        errorMessage = 'Login is taking longer than expected. Please check your connection.';
+      }
+      
       setErrors({ 
-        general: error.message || 'Authentication failed. Please check your credentials.' 
+        general: errorMessage
       });
     }
   };

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "../utils/api";
+import authPerformanceMonitor from "../utils/authPerformance";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -26,21 +27,52 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  // Login user
+  // Login user (optimized for performance)
   login: async (email, password) => {
     set({ isLoading: true, error: null });
+    
+    const startTime = authPerformanceMonitor.trackLoginStart();
+    
     try {
       const { data } = await api.post('/auth/login', { email, password });
+      
+      // Store token immediately for faster subsequent requests
       localStorage.setItem('token', data.token);
+      
+      // Update state optimistically
       set({
         user: data.user,
         isAuthenticated: true,
-        isLoading: false
+        isLoading: false,
+        error: null
       });
+      
+      const performanceResult = authPerformanceMonitor.trackLoginEnd(startTime, true);
+      
       return data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
-      set({ error: message, isLoading: false });
+      const performanceResult = authPerformanceMonitor.trackLoginEnd(startTime, false);
+      
+      let message = 'Authentication failed';
+      
+      if (error.code === 'ECONNABORTED') {
+        message = 'Connection timeout. Please check your internet connection.';
+      } else if (error.response?.status === 401) {
+        message = 'Invalid email or password';
+      } else if (error.response?.status >= 500) {
+        message = 'Server error. Please try again later.';
+      } else if (error.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      
+      set({ 
+        error: message, 
+        isLoading: false,
+        isAuthenticated: false,
+        user: null
+      });
+      
+      console.error(`Authentication failed after ${performanceResult.duration}ms:`, error);
       throw new Error(message);
     }
   },
