@@ -8,7 +8,7 @@ export default defineConfig({
     open: true,
   },
   build: {
-    minify: 'esbuild',
+    minify: 'esbuild', //added now
     target: 'es2020',
     sourcemap: false,
     rollupOptions: {
