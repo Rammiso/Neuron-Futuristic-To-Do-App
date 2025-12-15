@@ -17,6 +17,9 @@ connectDB();
 // Initialize app
 const app = express();
 
+// Trust proxy for Render deployment
+app.set('trust proxy', 1);
+
 // Security middlewares
 app.use(helmet());
 app.use(mongoSanitize());
@@ -65,7 +68,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'NEURON Tasks API is running',

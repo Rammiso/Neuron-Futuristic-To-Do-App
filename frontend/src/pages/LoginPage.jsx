@@ -220,14 +220,14 @@ export const LoginPage = () => {
                 </p>
               </div>
               
-              <div className="text-center">
+             {/* <div className="text-center">
                 <Link
                   to="/demo"
                   className="text-cyan-400 hover:text-cyan-300 transition-colors font-mono text-sm"
                 >
                   → ENTER DEMO MODE
                 </Link>
-              </div>
+              </div> */}
             </motion.div>
 
             {/* Demo Info */}
