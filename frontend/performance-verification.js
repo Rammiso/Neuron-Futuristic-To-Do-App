@@ -22,7 +22,7 @@ const checks = [];
 // Check 1: Vite config has bundle optimization
 try {
   const viteConfig = fs.readFileSync(path.join(__dirname, 'vite.config.js'), 'utf8');
-  if (viteConfig.includes('manualChunks') && viteConfig.includes('terserOptions')) {
+  if (viteConfig.includes('manualChunks') && (viteConfig.includes('esbuild') || viteConfig.includes('terserOptions'))) {
     checks.push('✅ Bundle optimization configured');
   } else {
     checks.push('❌ Bundle optimization missing');

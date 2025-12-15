@@ -30,13 +30,13 @@ export default defineConfig({
     },
     // Optimize for faster loading
     target: 'esnext',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    }
+    minify: 'esbuild', // Use esbuild (faster, smaller bundle, no extra dependencies)
+    esbuild: {
+      drop: ['console', 'debugger'], // Remove console.log and debugger in production
+    },
+    // Additional optimizations
+    sourcemap: false, // Disable sourcemaps in production for smaller bundle
+    chunkSizeWarningLimit: 1000, // Increase chunk size warning limit
   },
   // Performance optimizations
   optimizeDeps: {
