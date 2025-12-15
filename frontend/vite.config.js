@@ -14,7 +14,8 @@ export default defineConfig({
     historyApiFallback: true, // Enable SPA routing in preview mode
   },
   build: {
-    minify: 'esbuild', //added now
+    outDir: 'dist',
+    minify: 'esbuild',
     target: 'es2020',
     sourcemap: false,
     rollupOptions: {
