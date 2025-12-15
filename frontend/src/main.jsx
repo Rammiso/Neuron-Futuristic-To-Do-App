@@ -62,12 +62,19 @@ class AppErrorBoundary extends React.Component {
 const renderApp = () => {
   const root = ReactDOM.createRoot(document.getElementById("root"));
   
+  // Remove StrictMode in production to prevent double mounting
+  const AppComponent = (
+    <AppErrorBoundary>
+      <App />
+    </AppErrorBoundary>
+  );
+
   root.render(
-    <React.StrictMode>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
-    </React.StrictMode>
+    process.env.NODE_ENV === 'development' ? (
+      <React.StrictMode>{AppComponent}</React.StrictMode>
+    ) : (
+      AppComponent
+    )
   );
 
   // Log initialization time

@@ -10,8 +10,8 @@ import { useThemeStore } from "./context/themeStore";
 import { useEffect, Suspense, lazy, useState } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppShell, DashboardShell } from "./components/AppShell";
-import { useTwoPhaseInit, useProgressiveFeature } from "./hooks/useTwoPhaseInit";
-import performanceMonitor, { usePerformanceOptimization } from "./utils/performanceMonitor";
+import { usePerformanceOptimization } from "./utils/performanceMonitor";
+import { useRenderLoopProtection } from "./utils/renderLoopProtection";
 
 // Phase 1: Critical path - immediate imports (no lazy loading)
 import { LandingPage } from "./pages/LandingPage";
@@ -43,106 +43,109 @@ const CyberTransition = lazy(() =>
   import("./components/PageTransition").then(m => ({ default: m.CyberTransition }))
 );
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+// Stable route components that don't cause remounting
+const ProtectedRoute = ({ children, isAuthenticated }) => {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+const AuthAwareRoute = ({ children, isAuthenticated, redirectTo, transitionsEnabled }) => {
+  if (isAuthenticated) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  if (transitionsEnabled) {
+    return (
+      <Suspense fallback={<AppShell isLoading={true} />}>
+        <CyberTransition>{children}</CyberTransition>
+      </Suspense>
+    );
+  }
+
+  return children;
 };
 
 
 
-const AnimatedRoutes = () => {
+const AnimatedRoutes = ({ isInitialized }) => {
   const location = useLocation();
   const { isAuthenticated, loadUser, checkAuthSync } = useAuthStore();
   const { isDark, loadSettings } = useThemeStore();
-  const { phase, isReady, isCritical, isEnhanced, isComplete, hasBlockingTasks } = useTwoPhaseInit();
-  const { isLowEndDevice, prefersReducedMotion, loadingStrategy } = usePerformanceOptimization();
+  const { isLowEndDevice, prefersReducedMotion } = usePerformanceOptimization();
   
-  // Disable transitions on low-end devices or if user prefers reduced motion
-  const transitionsEnabled = useProgressiveFeature('transitions', 'medium') && 
-                            !isLowEndDevice && 
-                            !prefersReducedMotion &&
-                            !hasBlockingTasks;
+  // Render loop protection
+  const isLooping = useRenderLoopProtection('AnimatedRoutes');
+  
+  // Stable state management - no complex initialization hooks
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const [enhancementsLoaded, setEnhancementsLoaded] = useState(false);
+  
+  // Simple transitions control
+  const transitionsEnabled = enhancementsLoaded && !isLowEndDevice && !prefersReducedMotion && !isLooping;
 
-  // Phase 1: Critical path - immediate, synchronous operations only (non-blocking)
+  // Single auth initialization - runs once only
   useEffect(() => {
-    // Immediate auth check (synchronous from localStorage) - never blocks
-    const startTime = performance.now();
-    
-    try {
-      checkAuthSync();
-      
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      
-      // Log warning if critical path takes too long
-      if (duration > 16) { // More than one frame (16ms at 60fps)
-        console.warn(`Critical path took ${duration}ms - should be <16ms`);
-      }
-      
-    } catch (error) {
-      console.error('Error in critical path:', error);
-      // Never let errors block the UI
-    }
-  }, [checkAuthSync]);
+    if (!isInitialized || authInitialized) return;
 
-  // Phase 2: Enhanced features - background loading (never blocks UI)
-  useEffect(() => {
-    if (!isEnhanced || hasBlockingTasks) return;
-
-    // Use requestIdleCallback to ensure we don't block the main thread
-    const performBackgroundTasks = () => {
+    const initializeAuth = () => {
       try {
+        // Synchronous auth check from localStorage
+        checkAuthSync();
+        setAuthInitialized(true);
+
         // Background user validation (non-blocking)
         const token = localStorage.getItem('token');
-        if (token && !isAuthenticated) {
+        if (token) {
           loadUser().catch(() => {
-            // Silent fail, user will see login if needed
+            // Silent fail, auth state already set from token presence
           });
         }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setAuthInitialized(true); // Prevent infinite loops
+      }
+    };
 
-        // Background settings loading (non-blocking)
+    initializeAuth();
+  }, [isInitialized, authInitialized, checkAuthSync, loadUser]);
+
+  // Background enhancements - load after auth is stable
+  useEffect(() => {
+    if (!authInitialized || enhancementsLoaded) return;
+
+    const loadEnhancements = () => {
+      try {
+        // Load settings if authenticated
         if (isAuthenticated) {
           loadSettings().catch(() => {
             // Silent fail, use defaults
           });
         }
+
+        // Enable enhancements after a short delay
+        setTimeout(() => {
+          setEnhancementsLoaded(true);
+        }, 100);
       } catch (error) {
-        console.error('Error in background tasks:', error);
-        // Never let background tasks affect UI
+        console.error('Enhancement loading error:', error);
+        setEnhancementsLoaded(true); // Prevent infinite loops
       }
     };
 
-    // Use requestIdleCallback to run during idle time
+    // Use requestIdleCallback for non-blocking enhancement loading
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(performBackgroundTasks, { timeout: 2000 });
+      requestIdleCallback(loadEnhancements, { timeout: 1000 });
     } else {
-      // Fallback for browsers without requestIdleCallback
-      setTimeout(performBackgroundTasks, 100);
+      setTimeout(loadEnhancements, 50);
     }
-  }, [isEnhanced, isAuthenticated, loadUser, loadSettings, hasBlockingTasks]);
+  }, [authInitialized, enhancementsLoaded, isAuthenticated, loadSettings]);
 
-  // Theme updates (prevent flickering by checking current state)
-  useEffect(() => {
-    const currentlyDark = document.documentElement.classList.contains('dark');
-    
-    if (isDark && !currentlyDark) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.style.colorScheme = 'dark';
-      localStorage.setItem('theme', 'true');
-    } else if (!isDark && currentlyDark) {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.style.colorScheme = 'light';
-      localStorage.setItem('theme', 'false');
-    }
-  }, [isDark]);
-
-  // Show app shell during critical phase
-  if (isCritical || !isReady) {
-    return <AppShell isLoading={true} />;
+  // Show loading state only during initial app load
+  if (!isInitialized || !authInitialized) {
+    return <AppShell isLoading={true} type="page" />;
   }
 
-  // Progressive route wrapper
-  const ProgressiveRoute = ({ children, fallback = <DashboardShell /> }) => {
+  // Stable progressive route wrapper
+  const ProgressiveRoute = ({ children, transitionsEnabled, fallback = <DashboardShell /> }) => {
     if (transitionsEnabled) {
       return (
         <Suspense fallback={fallback}>
@@ -178,30 +181,26 @@ const AnimatedRoutes = () => {
         <Route
           path="/login"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : transitionsEnabled ? (
-              <Suspense fallback={<AppShell isLoading={true} />}>
-                <CyberTransition><LoginPage /></CyberTransition>
-              </Suspense>
-            ) : (
+            <AuthAwareRoute 
+              isAuthenticated={isAuthenticated}
+              redirectTo="/dashboard"
+              transitionsEnabled={transitionsEnabled}
+            >
               <LoginPage />
-            )
+            </AuthAwareRoute>
           }
         />
         
         <Route
           path="/register"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : transitionsEnabled ? (
-              <Suspense fallback={<AppShell isLoading={true} />}>
-                <CyberTransition><RegisterPage /></CyberTransition>
-              </Suspense>
-            ) : (
+            <AuthAwareRoute 
+              isAuthenticated={isAuthenticated}
+              redirectTo="/dashboard"
+              transitionsEnabled={transitionsEnabled}
+            >
               <RegisterPage />
-            )
+            </AuthAwareRoute>
           }
         />
         
@@ -218,8 +217,8 @@ const AnimatedRoutes = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
-              <ProgressiveRoute>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProgressiveRoute transitionsEnabled={transitionsEnabled}>
                 <DashboardPage />
               </ProgressiveRoute>
             </ProtectedRoute>
@@ -229,8 +228,8 @@ const AnimatedRoutes = () => {
         <Route
           path="/calendar"
           element={
-            <ProtectedRoute>
-              <ProgressiveRoute>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProgressiveRoute transitionsEnabled={transitionsEnabled}>
                 <CalendarPage />
               </ProgressiveRoute>
             </ProtectedRoute>
@@ -240,8 +239,8 @@ const AnimatedRoutes = () => {
         <Route
           path="/tasks"
           element={
-            <ProtectedRoute>
-              <ProgressiveRoute>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProgressiveRoute transitionsEnabled={transitionsEnabled}>
                 <TasksPage />
               </ProgressiveRoute>
             </ProtectedRoute>
@@ -251,8 +250,8 @@ const AnimatedRoutes = () => {
         <Route
           path="/ai"
           element={
-            <ProtectedRoute>
-              <ProgressiveRoute>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProgressiveRoute transitionsEnabled={transitionsEnabled}>
                 <AIAssistantPage />
               </ProgressiveRoute>
             </ProtectedRoute>
@@ -262,8 +261,8 @@ const AnimatedRoutes = () => {
         <Route
           path="/settings"
           element={
-            <ProtectedRoute>
-              <ProgressiveRoute>
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProgressiveRoute transitionsEnabled={transitionsEnabled}>
                 <SettingsPage />
               </ProgressiveRoute>
             </ProtectedRoute>
@@ -274,10 +273,42 @@ const AnimatedRoutes = () => {
   );
 };
 
+// Stable app shell that never unmounts
 function App() {
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Single initialization effect - runs once only
+  useEffect(() => {
+    const initializeApp = () => {
+      try {
+        // Apply theme immediately
+        const savedTheme = localStorage.getItem('theme');
+        const shouldBeDark = savedTheme === null || savedTheme === 'true';
+        
+        if (shouldBeDark) {
+          document.documentElement.classList.add("dark");
+          document.documentElement.style.colorScheme = 'dark';
+        } else {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.style.colorScheme = 'light';
+        }
+
+        // Mark as initialized
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('App initialization error:', error);
+        // Still mark as initialized to prevent infinite loops
+        setIsInitialized(true);
+      }
+    };
+
+    initializeApp();
+  }, []); // Empty dependency array - runs once only
+
+  // Always render the router, never unmount
   return (
     <Router>
-      <AnimatedRoutes />
+      <AnimatedRoutes isInitialized={isInitialized} />
     </Router>
   );
 }

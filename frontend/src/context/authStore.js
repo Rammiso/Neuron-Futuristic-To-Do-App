@@ -107,15 +107,24 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  // Quick auth check (synchronous)
+  // Quick auth check (synchronous, stable)
   checkAuthSync: () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      set({ isAuthenticated: true });
-      return true;
+    try {
+      const token = localStorage.getItem('token');
+      const isAuth = !!token;
+      
+      // Only update state if it's different
+      const currentState = get();
+      if (currentState.isAuthenticated !== isAuth) {
+        set({ isAuthenticated: isAuth });
+      }
+      
+      return isAuth;
+    } catch (error) {
+      console.error('Auth check error:', error);
+      set({ isAuthenticated: false });
+      return false;
     }
-    set({ isAuthenticated: false });
-    return false;
   },
 
   // Update user profile

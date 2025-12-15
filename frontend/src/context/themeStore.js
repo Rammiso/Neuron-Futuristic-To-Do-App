@@ -1,19 +1,27 @@
 import { create } from "zustand";
 import api from "../utils/api";
 
-// Initialize theme from localStorage immediately
+// Initialize theme from localStorage immediately (stable)
 const getInitialTheme = () => {
-  const savedTheme = localStorage.getItem('theme');
-  return savedTheme === null || savedTheme === 'true';
+  try {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme === null || savedTheme === 'true';
+  } catch (error) {
+    return true; // Default to dark theme
+  }
 };
+
+let themeInitialized = false;
 
 export const useThemeStore = create((set, get) => ({
   isDark: getInitialTheme(),
   aiEnabled: true,
   isLoading: false,
 
-  // Load settings from backend (non-blocking, no DOM manipulation)
+  // Load settings from backend (stable, no conflicts)
   loadSettings: async () => {
+    if (themeInitialized) return; // Prevent multiple initializations
+    
     try {
       const { data } = await api.get('/settings');
       const currentTheme = get().isDark;
@@ -26,20 +34,16 @@ export const useThemeStore = create((set, get) => ({
           aiEnabled: data.settings.aiEnabled
         });
         
-        // Update DOM only if theme actually changed
-        if (serverTheme) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-        
-        // Update localStorage
+        // Update localStorage only
         localStorage.setItem('theme', serverTheme.toString());
       } else {
         // Just update AI setting if theme is the same
         set({ aiEnabled: data.settings.aiEnabled });
       }
+      
+      themeInitialized = true;
     } catch (error) {
+      themeInitialized = true; // Prevent retry loops
       if (process.env.NODE_ENV === 'development') {
         console.error('Failed to load settings:', error);
       }
