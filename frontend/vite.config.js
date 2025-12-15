@@ -3,9 +3,15 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  base: '/', // Ensure correct base path for SPA routing
   server: {
     port: 5173,
     open: true,
+    historyApiFallback: true, // Enable SPA routing in dev server
+  },
+  preview: {
+    port: 4173,
+    historyApiFallback: true, // Enable SPA routing in preview mode
   },
   build: {
     minify: 'esbuild', //added now

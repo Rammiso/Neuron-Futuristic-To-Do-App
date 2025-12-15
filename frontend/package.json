@@ -8,12 +8,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/neuron-tasks.git"
+    "url": "https://github.com/Rammiso/Neuron-Futuristic-To-Do-App"
   },
   "bugs": {
     "url": "https://github.com/yourusername/neuron-tasks/issues"
   },
-  "homepage": "https://github.com/yourusername/neuron-tasks#readme",
+  "homepage": "https://github.com/Rammiso/Neuron-Futuristic-To-Do-App#readme",
   "keywords": [
     "react",
     "vite",
