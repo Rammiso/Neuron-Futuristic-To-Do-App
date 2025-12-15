@@ -8,15 +8,17 @@ export default defineConfig({
     open: true,
   },
   build: {
+    // Force esbuild minification (no terser)
+    minify: 'esbuild',
+    target: 'esnext',
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
-          // Critical vendor chunks
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['framer-motion', 'lucide-react'],
           'state-vendor': ['zustand', 'axios'],
-          
-          // Feature chunks (lazy loaded)
           'dashboard-chunk': [
             './src/pages/DashboardPage.jsx',
             './src/pages/CalendarPage.jsx',
@@ -28,15 +30,11 @@ export default defineConfig({
         }
       }
     },
-    // Optimize for faster loading
-    target: 'esnext',
-    minify: 'esbuild', // Use esbuild (faster, smaller bundle, no extra dependencies)
     esbuild: {
-      drop: ['console', 'debugger'], // Remove console.log and debugger in production
-    },
-    // Additional optimizations
-    sourcemap: false, // Disable sourcemaps in production for smaller bundle
-    chunkSizeWarningLimit: 1000, // Increase chunk size warning limit
+      drop: ['console', 'debugger'],
+      minify: true,
+      target: 'esnext'
+    }
   },
   // Performance optimizations
   optimizeDeps: {

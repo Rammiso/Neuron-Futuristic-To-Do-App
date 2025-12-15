@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import Settings from '../models/Settings.js';
+import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/generateToken.js';
 
 // @desc    Register new user
@@ -43,15 +44,15 @@ export const register = async (req, res, next) => {
   }
 };
 
-// @desc    Login user
+// @desc    Login user (optimized for performance)
 // @route   POST /api/auth/login
 // @access  Public
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    // Optimized: Find user with lean() for faster query and select only needed fields
+    const user = await User.findOne({ email }).select('+password').lean();
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -60,7 +61,7 @@ export const login = async (req, res, next) => {
     }
 
     // Check password
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -68,17 +69,32 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // Update last active
-    user.lastActive = Date.now();
-    await user.save();
+    // Optimized: Update last active without waiting (fire and forget)
+    User.findByIdAndUpdate(user._id, { lastActive: Date.now() }).exec();
 
     // Generate token
     const token = generateToken(user._id);
 
+    // Create public profile manually (since we used lean())
+    const publicProfile = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      phone: user.phone || '',
+      location: user.location || '',
+      role: user.role || 'Student',
+      bio: user.bio || '',
+      joinDate: user.createdAt.toISOString().split('T')[0],
+      tasksCompleted: user.tasksCompleted || 0,
+      streak: user.streak || 0,
+      level: user.level || 1
+    };
+
     res.json({
       success: true,
       token,
-      user: user.getPublicProfile()
+      user: publicProfile
     });
   } catch (error) {
     next(error);
