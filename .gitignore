@@ -170,3 +170,6 @@ docker-compose.yml
 .netlify
 
 .DEPLOYMENT_GUIDE.md
+.github
+.vscode
+.RENDER_DEPLOYMENT.md
