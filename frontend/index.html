@@ -3,6 +3,22 @@
   <head>
     <meta charset="UTF-8" />
 
+    <!-- CRITICAL: Prevent theme flickering -->
+    <script>
+      (function () {
+        const savedTheme = localStorage.getItem("theme");
+        const shouldBeDark = savedTheme === null || savedTheme === "true";
+
+        if (shouldBeDark) {
+          document.documentElement.classList.add("dark");
+          document.documentElement.style.colorScheme = "dark";
+        } else {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.style.colorScheme = "light";
+        }
+      })();
+    </script>
+
     <!-- Favicon and App Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />

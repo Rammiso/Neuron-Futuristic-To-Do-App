@@ -54,27 +54,27 @@ export const useTwoPhaseInit = () => {
     const startEnhancement = () => {
       // Check if we should defer based on device capability
       const strategy = performanceMonitor.getLoadingStrategy();
-      const delay = strategy.deferAnimations ? 500 : 100;
+      const delay = strategy.deferAnimations ? 500 : 50; // Reduced delay
       
       if ('requestIdleCallback' in window) {
         requestIdleCallback(scheduleEnhancement, { timeout: delay });
       } else {
-        setTimeout(scheduleEnhancement, 0);
+        setTimeout(scheduleEnhancement, 16); // One frame delay
       }
     };
 
-    // Wait for first paint before starting enhancements
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', startEnhancement);
-    } else {
+    // Start immediately if DOM is ready, otherwise wait
+    if (document.readyState === 'complete') {
       startEnhancement();
+    } else {
+      window.addEventListener('load', startEnhancement, { once: true });
     }
 
     return () => {
       window.removeEventListener('performance:blocking-task', handleBlockingTask);
-      document.removeEventListener('DOMContentLoaded', startEnhancement);
+      window.removeEventListener('load', startEnhancement);
     };
-  }, [hasBlockingTasks]);
+  }, []); // Remove hasBlockingTasks dependency to prevent loops
 
   const isCritical = phase === 'critical';
   const isEnhanced = phase === 'enhanced' || phase === 'complete';

@@ -71,16 +71,6 @@ const AnimatedRoutes = () => {
     try {
       checkAuthSync();
       
-      // Immediate theme application (no flash) - synchronous DOM operation
-      const savedTheme = localStorage.getItem('theme');
-      const shouldBeDark = savedTheme === 'false' ? false : true;
-      
-      if (shouldBeDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-      
       const endTime = performance.now();
       const duration = endTime - startTime;
       
@@ -131,13 +121,17 @@ const AnimatedRoutes = () => {
     }
   }, [isEnhanced, isAuthenticated, loadUser, loadSettings, hasBlockingTasks]);
 
-  // Theme updates (immediate)
+  // Theme updates (prevent flickering by checking current state)
   useEffect(() => {
-    if (isDark) {
+    const currentlyDark = document.documentElement.classList.contains('dark');
+    
+    if (isDark && !currentlyDark) {
       document.documentElement.classList.add("dark");
+      document.documentElement.style.colorScheme = 'dark';
       localStorage.setItem('theme', 'true');
-    } else {
+    } else if (!isDark && currentlyDark) {
       document.documentElement.classList.remove("dark");
+      document.documentElement.style.colorScheme = 'light';
       localStorage.setItem('theme', 'false');
     }
   }, [isDark]);

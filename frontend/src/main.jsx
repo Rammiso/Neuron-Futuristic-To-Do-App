@@ -5,6 +5,24 @@ import "./index.css";
 import { EmergencyFallback } from "./components/InstantLoader";
 import "./utils/performanceTest.js"; // Auto-runs in development
 
+// CRITICAL: Apply theme IMMEDIATELY to prevent flickering
+const applyInitialTheme = () => {
+  const savedTheme = localStorage.getItem('theme');
+  const shouldBeDark = savedTheme === null || savedTheme === 'true';
+  
+  if (shouldBeDark) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+  
+  // Prevent any flash by setting initial styles
+  document.documentElement.style.colorScheme = shouldBeDark ? 'dark' : 'light';
+};
+
+// Apply theme before any React rendering
+applyInitialTheme();
+
 // Performance monitoring starts immediately
 const startTime = performance.now();
 
