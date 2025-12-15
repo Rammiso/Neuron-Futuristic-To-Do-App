@@ -45,12 +45,18 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  // Get current user
+  // Get current user (optimized for progressive loading)
   loadUser: async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      set({ isAuthenticated: false, isLoading: false });
+      return;
+    }
 
-    set({ isLoading: true });
+    // Set authenticated immediately based on token presence
+    // This prevents blocking the UI while validating
+    set({ isAuthenticated: true, isLoading: true });
+
     try {
       const { data } = await api.get('/auth/me');
       set({
@@ -59,6 +65,7 @@ export const useAuthStore = create((set) => ({
         isLoading: false
       });
     } catch (error) {
+      // Only clear auth if token is actually invalid
       localStorage.removeItem('token');
       set({
         user: null,
@@ -66,6 +73,17 @@ export const useAuthStore = create((set) => ({
         isLoading: false
       });
     }
+  },
+
+  // Quick auth check (synchronous)
+  checkAuthSync: () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      set({ isAuthenticated: true });
+      return true;
+    }
+    set({ isAuthenticated: false });
+    return false;
   },
 
   // Update user profile

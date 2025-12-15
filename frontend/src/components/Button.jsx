@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { memo, useMemo, useCallback } from "react";
-import { performanceMonitor } from "../utils/performance";
+import { usePerformanceOptimization } from "../utils/performanceMonitor";
 
 // Memoized corner accents component
 const CornerAccents = memo(() => (
@@ -13,15 +13,22 @@ const CornerAccents = memo(() => (
   </>
 ));
 
-// Memoized loading spinner
-const LoadingSpinner = memo(() => (
-  <motion.div
-    animate={{ rotate: 360 }}
-    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-  >
-    <Loader2 className="w-4 h-4" />
-  </motion.div>
-));
+// Memoized loading spinner with performance optimization
+const LoadingSpinner = memo(({ reduced = false }) => {
+  if (reduced) {
+    // Static spinner for low-end devices
+    return <Loader2 className="w-4 h-4 animate-spin" />;
+  }
+
+  return (
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+    >
+      <Loader2 className="w-4 h-4" />
+    </motion.div>
+  );
+});
 
 export const Button = memo(({
   children,
@@ -35,8 +42,13 @@ export const Button = memo(({
   ...props
 }) => {
   const isDisabled = disabled || loading;
-  const animationConfig = performanceMonitor.getOptimizedAnimationConfig();
-  const shouldAnimate = !disableAnimations && !performanceMonitor.prefersReducedMotion();
+  const { isLowEndDevice, prefersReducedMotion, animationConfig } = usePerformanceOptimization();
+  
+  // Disable animations on low-end devices, if user prefers reduced motion, or while loading
+  const shouldAnimate = !disableAnimations && 
+                       !isLowEndDevice && 
+                       !prefersReducedMotion &&
+                       !loading; // Prevent animations during loading to avoid blocking
 
   // Memoized style objects to prevent recreation
   const baseStyles = useMemo(() => `
@@ -134,7 +146,7 @@ export const Button = memo(({
       
       {/* Content */}
       <span className="relative z-10 flex items-center justify-center space-x-2">
-        {loading && <LoadingSpinner />}
+        {loading && <LoadingSpinner reduced={isLowEndDevice || prefersReducedMotion} />}
         <span>{children}</span>
       </span>
       

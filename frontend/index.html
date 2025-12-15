@@ -5,9 +5,6 @@
 
     <!-- Favicon and App Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#00ff88" />
 
@@ -129,9 +126,8 @@
       }
     </script>
 
-    <!-- Security Headers -->
+    <!-- Security Headers (X-Frame-Options handled by server headers) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta
       http-equiv="Referrer-Policy"
@@ -247,17 +243,7 @@
       });
 
       // Performance monitoring
-      if ("performance" in window) {
-        window.addEventListener("load", function () {
-          setTimeout(function () {
-            const perfData = performance.getEntriesByType("navigation")[0];
-            // Performance monitoring for development only
-            if (perfData && process.env.NODE_ENV === "development") {
-              // Performance logging removed for production
-            }
-          }, 0);
-        });
-      }
+      // Performance monitoring removed for cleaner production build
     </script>
 
     <script type="module" src="/src/main.jsx"></script>

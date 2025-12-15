@@ -18,7 +18,13 @@ import {
   Settings,
   Monitor,
   Cpu,
-  Activity
+  Activity,
+  Code,
+  Mail,
+  Github,
+  Linkedin,
+  MessageCircle,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "../components/Button";
 import { HolographicCard } from "../components/HolographicCard";
@@ -408,6 +414,77 @@ export const SettingsPage = () => {
                     <button className="text-neon-dark dark:text-neon-green hover:text-neon-green dark:hover:text-neon-lime transition-colors font-bold">
                       FEEDBACK
                     </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Developer Info */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="glass rounded-lg p-6 border border-emerald-500/20"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                  <Code className="w-5 h-5 text-emerald-400" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 font-mono">
+                  DEVELOPER
+                </h2>
+              </div>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    Developed with ❤️ by{' '}
+                    <span className="text-emerald-400 font-semibold font-mono">Musab Hassen</span>
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                    <a
+                      href="mailto:mushas1248@gmail.com"
+                      className="flex items-center justify-center gap-2 p-2 glass rounded-lg hover:bg-emerald-500/10 transition-colors"
+                    >
+                      <Mail className="w-3 h-3 text-emerald-400" />
+                      <span className="text-gray-600 dark:text-gray-400">Email</span>
+                    </a>
+                    <a
+                      href="https://github.com/Rammiso"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 p-2 glass rounded-lg hover:bg-emerald-500/10 transition-colors"
+                    >
+                      <Github className="w-3 h-3 text-emerald-400" />
+                      <span className="text-gray-600 dark:text-gray-400">GitHub</span>
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/in/musab-hassen-b86247316/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 p-2 glass rounded-lg hover:bg-emerald-500/10 transition-colors"
+                    >
+                      <Linkedin className="w-3 h-3 text-emerald-400" />
+                      <span className="text-gray-600 dark:text-gray-400">LinkedIn</span>
+                    </a>
+                    <a
+                      href="https://t.me/ramiso0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 p-2 glass rounded-lg hover:bg-emerald-500/10 transition-colors"
+                    >
+                      <MessageCircle className="w-3 h-3 text-emerald-400" />
+                      <span className="text-gray-600 dark:text-gray-400">Telegram</span>
+                    </a>
+                    <a
+                      href="#"
+                      className="flex items-center justify-center gap-2 p-2 glass rounded-lg hover:bg-emerald-500/10 transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3 text-emerald-400" />
+                      <span className="text-gray-600 dark:text-gray-400">Portfolio</span>
+                    </a>
+                    <div className="flex items-center justify-center gap-2 p-2 glass rounded-lg">
+                      <span className="text-xs text-gray-500 dark:text-gray-500 font-mono">v1.0.0</span>
+                    </div>
                   </div>
                 </div>
               </div>

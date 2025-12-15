@@ -152,39 +152,44 @@ export const CyberTransition = ({ children }) => {
   );
 };
 
-// Loading transition with neural network effect
+// Non-blocking transition with instant feedback
 export const NeuralTransition = ({ children, isLoading = false }) => {
   const location = useLocation();
 
+  // NEVER show a blocking loading screen - always return content immediately
   if (isLoading) {
+    // Return instant skeleton instead of blocking screen
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-gray-900 flex items-center justify-center z-50"
-      >
-        <div className="text-center">
-          <motion.div
-            className="w-16 h-16 border-2 border-emerald-500/30 rounded-full mx-auto mb-4"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <motion.div
-              className="w-full h-full border-t-2 border-emerald-400 rounded-full"
-              animate={{ rotate: -360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.div>
-          <motion.p
-            className="text-emerald-400 font-mono text-sm"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            INITIALIZING NEURAL INTERFACE...
-          </motion.p>
+      <div className="min-h-screen bg-gray-900">
+        <div className="animate-pulse">
+          {/* Instant navigation skeleton */}
+          <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 border-b border-gray-700/50">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-emerald-400/20 rounded-lg"></div>
+                <div className="w-20 h-6 bg-gray-700/30 rounded"></div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-8 bg-gray-700/20 rounded"></div>
+                <div className="w-20 h-8 bg-emerald-400/20 rounded"></div>
+              </div>
+            </div>
+          </nav>
+          
+          {/* Instant content skeleton */}
+          <div className="pt-20 px-6">
+            <div className="max-w-7xl mx-auto py-12">
+              <div className="h-12 bg-gray-800/30 rounded mb-6"></div>
+              <div className="h-6 bg-gray-800/20 rounded mb-4 w-3/4"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-32 bg-gray-800/20 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
