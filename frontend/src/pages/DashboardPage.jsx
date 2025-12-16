@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { motion } from "framer-motion";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { 
@@ -23,7 +23,6 @@ import {
   Brain,
   Activity
 } from "lucide-react";
-import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { TaskModal } from "../components/TaskModal";
 
 // Memoized stat card component
