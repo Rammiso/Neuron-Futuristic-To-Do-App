@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// Use relative URL for production (Vercel) or environment variable for development
-const API_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
+// Use environment variable or fallback to localhost for development
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Navigation utility for programmatic routing without full page reload
 let navigate = null;
