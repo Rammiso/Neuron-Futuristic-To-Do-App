@@ -96,7 +96,7 @@ const ProductivityMetric = memo(({ metric, index }) => (
 ));
 
 export const DashboardPage = () => {
-  const { tasks, loadTasks } = useTaskStore();
+  const { tasks, fetchTasks } = useTaskStore();
   const { user } = useAuthStore();
   
   // Use optimized selectors to prevent unnecessary re-renders
@@ -110,8 +110,8 @@ export const DashboardPage = () => {
 
   // Load tasks when component mounts
   useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+    fetchTasks();
+  }, []); // Empty dependency array to run only once
 
   // Optimized time update with reduced frequency
   useEffect(() => {

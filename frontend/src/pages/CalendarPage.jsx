@@ -28,7 +28,7 @@ export const CalendarPage = () => {
     isToday: checkIsToday,
     isSameMonth,
   } = useCalendar();
-  const { getTasksByDate, loadTasks } = useTaskStore();
+  const { getTasksByDate, fetchTasks } = useTaskStore();
   const tasksThisMonth = useTasksThisMonth();
   const tasksThisWeek = useTasksThisWeek();
   const tasksToday = useTasksToday();
@@ -37,8 +37,8 @@ export const CalendarPage = () => {
 
   // Load tasks when component mounts
   useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+    fetchTasks();
+  }, []); // Empty dependency array to run only once
 
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 

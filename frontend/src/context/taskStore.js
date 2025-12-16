@@ -294,6 +294,11 @@ export const useTaskStore = create(
     // Reset error state
     clearError: () => {
       set({ error: null });
+    },
+
+    // Alias for fetchTasks for better naming
+    loadTasks: async (filters = {}) => {
+      return get().fetchTasks(filters);
     }
   }))
 );

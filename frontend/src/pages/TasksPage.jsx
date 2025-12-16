@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const TasksPage = () => {
-  const { tasks, loadTasks, isLoading } = useTaskStore();
+  const { tasks, fetchTasks, isLoading } = useTaskStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterPriority, setFilterPriority] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -29,8 +29,8 @@ export const TasksPage = () => {
 
   // Load tasks when component mounts
   useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+    fetchTasks();
+  }, []); // Empty dependency array to run only once
 
   const filteredTasks = tasks.filter((task) => {
     const priorityMatch = filterPriority === "all" || task.priority === filterPriority;
