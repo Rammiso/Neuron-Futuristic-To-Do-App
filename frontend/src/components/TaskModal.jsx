@@ -72,10 +72,18 @@ export const TaskModal = ({ isOpen, onClose, task = null }) => {
       if (task) {
         await updateTask(task.id, formData);
       } else {
-        await addTask({
-          ...formData,
-          dueDate: new Date(formData.dueDate),
+        const taskData = {
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          dueDate: formData.dueDate, // Keep as YYYY-MM-DD string
+          priority: formData.priority,
+        };
+        console.log('📝 TaskModal sending data:', {
+          ...taskData,
+          dueDateType: typeof taskData.dueDate,
+          dueDateValue: taskData.dueDate
         });
+        await addTask(taskData);
       }
       onClose();
     } catch (error) {

@@ -27,8 +27,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "vercel-build": "vite build",
+    "build": "NODE_ENV=production vite build",
+    "build:analyze": "NODE_ENV=production vite build --mode analyze",
+    "vercel-build": "NODE_ENV=production vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "performance-check": "node performance-verification.js"

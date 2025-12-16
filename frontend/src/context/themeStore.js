@@ -18,16 +18,16 @@ export const useThemeStore = create((set, get) => ({
   aiEnabled: true,
   isLoading: false,
 
-  // Load settings from backend (stable, no conflicts)
+  // Load settings from backend (optimized, batched updates)
   loadSettings: async () => {
-    if (themeInitialized) return; // Prevent multiple initializations
+    if (themeInitialized) return;
     
     try {
       const { data } = await api.get('/settings');
       const currentTheme = get().isDark;
       const serverTheme = data.settings.theme.isDark;
       
-      // Only update if different from current theme
+      // Batch updates to prevent multiple re-renders
       if (currentTheme !== serverTheme) {
         set({
           isDark: serverTheme,

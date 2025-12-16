@@ -65,7 +65,10 @@ export const useTaskStore = create(
       }));
 
       try {
+        console.log('📝 Creating task with data:', taskData);
         const { data } = await api.post('/tasks', taskData);
+        console.log('✅ Task created successfully:', data);
+        
         const newTask = {
           ...data.task,
           dueDate: new Date(data.task.dueDate)
@@ -81,6 +84,13 @@ export const useTaskStore = create(
 
         return newTask;
       } catch (error) {
+        console.error('❌ Task creation failed:', {
+          error: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          taskData: taskData
+        });
+        
         // Remove optimistic task on error
         set((state) => ({
           tasks: state.tasks.filter(task => task.id !== optimisticTask.id),

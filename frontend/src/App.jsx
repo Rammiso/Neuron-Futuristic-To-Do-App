@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import { useAuthStore } from "./context/authStore";
 import { useThemeStore } from "./context/themeStore";
-import { useEffect, Suspense, lazy, useState } from "react";
+import { useEffect, Suspense, lazy, useState, useMemo, useCallback } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppShell, DashboardShell } from "./components/AppShell";
 import { usePerformanceOptimization } from "./utils/performanceMonitor";
@@ -82,8 +82,11 @@ const AnimatedRoutes = ({ isInitialized }) => {
   const [authInitialized, setAuthInitialized] = useState(false);
   const [enhancementsLoaded, setEnhancementsLoaded] = useState(false);
   
-  // Simple transitions control
-  const transitionsEnabled = enhancementsLoaded && !isLowEndDevice && !prefersReducedMotion && !isLooping;
+  // Optimized transitions control - memoized to prevent re-calculations
+  const transitionsEnabled = useMemo(() => 
+    enhancementsLoaded && !isLowEndDevice && !prefersReducedMotion && !isLooping,
+    [enhancementsLoaded, isLowEndDevice, prefersReducedMotion, isLooping]
+  );
 
   // Set up navigate function for API utility
   useEffect(() => {

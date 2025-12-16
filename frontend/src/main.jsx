@@ -3,7 +3,11 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { EmergencyFallback } from "./components/InstantLoader";
-import "./utils/performanceTest.js"; // Auto-runs in development
+
+// Only load performance monitoring in development
+if (process.env.NODE_ENV === 'development') {
+  import("./utils/performanceTest.js");
+}
 
 // CRITICAL: Apply theme IMMEDIATELY to prevent flickering
 const applyInitialTheme = () => {

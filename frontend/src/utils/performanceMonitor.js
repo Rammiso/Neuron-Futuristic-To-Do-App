@@ -13,7 +13,10 @@ class PerformanceMonitor {
     this.connectionSpeed = this.detectConnectionSpeed();
     this.isLowEndDevice = this.deviceCapability === 'low';
     
-    this.initializeMonitoring();
+    // Only initialize monitoring in development
+    if (process.env.NODE_ENV === 'development') {
+      this.initializeMonitoring();
+    }
   }
 
   // Detect device capability for adaptive loading
