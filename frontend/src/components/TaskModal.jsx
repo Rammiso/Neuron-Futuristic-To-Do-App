@@ -8,7 +8,7 @@ import { useTaskStore } from "../context/taskStore";
 import { AlertCircle } from "lucide-react";
 
 export const TaskModal = ({ isOpen, onClose, task = null }) => {
-  const { addTask, updateTask } = useTaskStore();
+  const { addTask, updateTask, loadTasks } = useTaskStore();
   
   // Initialize form data
   const getInitialFormData = () => {
@@ -84,6 +84,8 @@ export const TaskModal = ({ isOpen, onClose, task = null }) => {
           dueDateValue: taskData.dueDate
         });
         await addTask(taskData);
+        // Refresh tasks list to show the new task
+        await loadTasks();
       }
       onClose();
     } catch (error) {

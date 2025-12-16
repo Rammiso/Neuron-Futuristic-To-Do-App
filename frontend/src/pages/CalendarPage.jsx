@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { useCalendar } from "../hooks/useCalendar";
@@ -28,12 +28,17 @@ export const CalendarPage = () => {
     isToday: checkIsToday,
     isSameMonth,
   } = useCalendar();
-  const { getTasksByDate } = useTaskStore();
+  const { getTasksByDate, loadTasks } = useTaskStore();
   const tasksThisMonth = useTasksThisMonth();
   const tasksThisWeek = useTasksThisWeek();
   const tasksToday = useTasksToday();
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Load tasks when component mounts
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
 
   const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 

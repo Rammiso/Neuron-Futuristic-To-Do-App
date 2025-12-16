@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { 
@@ -96,7 +97,7 @@ const ProductivityMetric = memo(({ metric, index }) => (
 ));
 
 export const DashboardPage = () => {
-  const { tasks } = useTaskStore();
+  const { tasks, loadTasks } = useTaskStore();
   const { user } = useAuthStore();
   
   // Use optimized selectors to prevent unnecessary re-renders
@@ -107,6 +108,11 @@ export const DashboardPage = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Load tasks when component mounts
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
 
   // Optimized time update with reduced frequency
   useEffect(() => {

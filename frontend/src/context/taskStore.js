@@ -24,15 +24,22 @@ export const useTaskStore = create(
         return;
       }
 
+      console.log('📋 Loading tasks with filters:', filters);
       set({ isLoading: true, error: null });
       try {
         const params = new URLSearchParams(filters);
+        console.log('🔍 Fetching tasks from:', `/tasks?${params}`);
         const { data } = await api.get(`/tasks?${params}`);
         
         const processedTasks = data.tasks.map(task => ({
           ...task,
           dueDate: new Date(task.dueDate)
         }));
+
+        console.log('✅ Tasks loaded successfully:', {
+          count: processedTasks.length,
+          tasks: processedTasks
+        });
 
         set({
           tasks: processedTasks,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { useTaskStore } from "../context/taskStore";
@@ -20,12 +20,17 @@ import {
 } from "lucide-react";
 
 export const TasksPage = () => {
-  const { tasks } = useTaskStore();
+  const { tasks, loadTasks, isLoading } = useTaskStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterPriority, setFilterPriority] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState("grid"); // grid or list
+
+  // Load tasks when component mounts
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
 
   const filteredTasks = tasks.filter((task) => {
     const priorityMatch = filterPriority === "all" || task.priority === filterPriority;
